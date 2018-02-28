@@ -1,0 +1,25 @@
+{
+  "name": "steamap",
+  "version": "0.0.1",
+  "description": "Interactive Steam friend relation map.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nat-lab/steamap.git"
+  },
+  "keywords": [
+    "steam"
+  ],
+  "author": "Nato Morichika <nat@nat.moe>",
+  "license": "UNLICENSE",
+  "bugs": {
+    "url": "https://github.com/nat-lab/steamap/issues"
+  },
+  "homepage": "https://github.com/nat-lab/steamap#readme",
+  "dependencies": {
+    "vis": "^4.21.0"
+  }
+}
