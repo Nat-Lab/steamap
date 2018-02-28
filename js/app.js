@@ -11,11 +11,10 @@ var getFriends = id => new Promise((res, rej) => {
     if (this.status == 200) {
       var friends = JSON.parse(xhr.response).friendslist.friends;
       var ids = friends.map(f => f.steamid);
-      getInfoByIds(ids).then(friends => {
-        if(!friends.ok) rej({ok: false, err: friends.err});
-        res({ok: true, friends: friends.infos});
-       });
-    } else rej({ok: false, err: xhr.statusText});
+      getInfoByIds(ids)
+        .then(friends => res(friends))
+        .catch(e => rej(e));
+    } else rej(xhr.statusText);
   };
   xhr.send();
 
@@ -29,8 +28,8 @@ var getInfoByIds = ids => new Promise((res, rej) => {
   xhr.onload = function () {
     if (this.status == 200) {
       var infos = JSON.parse(xhr.response).response.players;
-      res({ok: true, infos});
-    } else rej({ok: false, err: xhr.statusText});
+      res(infos);
+    } else rej(xhr.statusText);
   }
 
   xhr.send();
@@ -74,11 +73,10 @@ async function drawRel(id) {
   working.className = '';
   var friends = await getFriends(id);
   working.className = 'hide';
-  if(!friends.ok) return;
   visited.push(id);
-  var info = (await getInfoByIds([id])).infos[0];
+  var info = (await getInfoByIds([id]))[0];
   addNode(id, info.personaname, info.avatarfull, nodes);
-  friends.friends.forEach(f => {
+  friends.forEach(f => {
     addNode(f.steamid, f.personaname, f.avatarfull, nodes);
     addEdge(id, f.steamid, edges);
   });
