@@ -89,15 +89,23 @@ async function drawRel(id) {
   working.className = '';
   try {
     var info = (await getInfoByIds([id]))[0];
+    if (info.communityvisibilitystate != 3) {
+      alert(`Error procressing id ${id}: Profile is not public.`);
+      working.className = 'hide';
+      return;
+    }
     var friends = await getFriends(id);
   } catch (e) {
-    alert(`Error procressing id ${id}: ${e}.
-
-Is Is the profile public? Is the ID correct? (use SteamID64, not profile name or custom URL)`);
+    alert(`Error procressing id ${id}: ${e}. Is the ID correct? (use SteamID64, not profile name or custom URL)`);
+    working.className = 'hide';
     return;
   }
   addNode(id, info.personaname, info.avatarfull, nodes);
   friends.forEach(f => {
+    if (f.communityvisibilitystate != 3) {
+      console.log(f.steamid, f.personaname, 'profile private, make unclickable.');
+      visited.push(f.steamid);
+    }
     addNode(f.steamid, f.personaname, f.avatarfull, nodes);
     addEdge(id, f.steamid, edges);
   });
