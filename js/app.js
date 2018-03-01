@@ -64,7 +64,7 @@ var container = document.getElementById('display');
 var working = document.getElementById('working');
 var nodes = new vis.DataSet();
 var edges = new vis.DataSet();
-var garph = new vis.Network(container, {nodes, edges}, {
+var graph = new vis.Network(container, {nodes, edges}, {
   nodes: {
     borderWidth: 1,
     size: 30,
@@ -76,14 +76,21 @@ var garph = new vis.Network(container, {nodes, edges}, {
     }
   }
 });
+
+graph.on('doubleClick', e => {
+  if(e.nodes.length) window.open('http://steamcommunity.com/profiles/' + e.nodes[0]);
+});
+
+graph.on('select', e => {
+  if(e.nodes.length) drawRel(e.nodes[0]);
+});
+
 var visited = [];
 
 var addNode = function(id, name, image, dst) {
   if(!dst.get().filter(n => n.id == id).length)
     try {
-    dst.add({id, label: name, shape: 'image', image, chosen: {
-      node: (values, uid) => { drawRel(uid); }
-    }});
+    dst.add({id, label: name, shape: 'image', image});
     } catch (e) {}
 }
 
