@@ -9,7 +9,11 @@ Object.defineProperty(Array.prototype, 'chunk', {
   }
 });
 
+var cached = [];
+
 var getFriends = id => new Promise((res, rej) => {
+
+  if(cached[id]) res(cached[id]);
 
   var api_pre = 'http://api.nat.moe/steamapi/GetFriendList/?steamid=';
   var xhr = new XMLHttpRequest();
@@ -20,7 +24,10 @@ var getFriends = id => new Promise((res, rej) => {
       var friends = JSON.parse(xhr.response).friendslist.friends;
       var ids = friends.map(f => f.steamid);
       getInfoByIds(ids)
-        .then(friends => res(friends))
+        .then(friends => {
+          cached[id] = friends;
+          res(friends)
+        })
         .catch(e => rej(e));
     } else rej(xhr.statusText);
   };
@@ -49,6 +56,7 @@ var getInfoByIds = ids => new Promise((res, rej) => {
        .map(arr => arr.join())
        .map(async ids => await fetchOnce(ids))
   ).then(arr => res(arr.reduce((accr, cuur) => accr.concat(cuur))));
+
 
 });
 
@@ -102,10 +110,7 @@ async function drawRel(id) {
   }
   addNode(id, info.personaname, info.avatarfull, nodes);
   friends.forEach(f => {
-    if (f.communityvisibilitystate != 3) {
-      console.log(f.steamid, f.personaname, 'profile private, make unclickable.');
-      visited.push(f.steamid);
-    }
+    if (f.communityvisibilitystate != 3) visited.push(f.steamid);
     addNode(f.steamid, f.personaname, f.avatarfull, nodes);
     addEdge(id, f.steamid, edges);
   });
