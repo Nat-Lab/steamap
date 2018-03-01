@@ -1,6 +1,17 @@
 api_key = localStorage.steamApiKey ? localStorage.steamApiKey : prompt('Steam API key (see http://steamcommunity.com/dev/apikey)');
 localStorage.steamApiKey = api_key;
 
+// https://stackoverflow.com/questions/8495687/split-array-into-chunks
+// too lazy.
+Object.defineProperty(Array.prototype, 'chunk', {
+  value: function(chunkSize) {
+    var R = [];
+    for (var i=0; i<this.length; i+=chunkSize)
+      R.push(this.slice(i,i+chunkSize));
+    return R;
+  }
+});
+
 var getFriends = id => new Promise((res, rej) => {
 
   var api_pre = 'http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key=' + api_key + '&relationship=friend&steamid=';
@@ -11,29 +22,37 @@ var getFriends = id => new Promise((res, rej) => {
     if (this.status == 200) {
       var friends = JSON.parse(xhr.response).friendslist.friends;
       var ids = friends.map(f => f.steamid);
-      getInfoByIds(ids).then(friends => {
-        if(!friends.ok) rej({ok: false, err: friends.err});
-        res({ok: true, friends: friends.infos});
-       });
-    } else rej({ok: false, err: xhr.statusText});
+      getInfoByIds(ids)
+        .then(friends => res(friends))
+        .catch(e => rej(e));
+    } else rej(xhr.statusText);
   };
   xhr.send();
 
 });
 
 var getInfoByIds = ids => new Promise((res, rej) => {
-  var prof_url = 'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=' + api_key + '&steamids=' + ids.join();
-  var xhr = new XMLHttpRequest();
 
-  xhr.open('GET', prof_url);
-  xhr.onload = function () {
-    if (this.status == 200) {
-      var infos = JSON.parse(xhr.response).response.players;
-      res({ok: true, infos});
-    } else rej({ok: false, err: xhr.statusText});
-  }
+  var fetchOnce = ids => new Promise((res, rej) => {
+    var prof_url = 'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=' + api_key + '&steamids=' + ids;
+    var xhr = new XMLHttpRequest();
 
-  xhr.send();
+    xhr.open('GET', prof_url);
+    xhr.onload = function () {
+      if (this.status == 200) {
+        var infos = JSON.parse(xhr.response).response.players;
+        res(infos);
+      } else rej(xhr.statusText);
+    }
+    xhr.send();
+  });
+
+  Promise.all(
+    ids.chunk(100)
+       .map(arr => arr.join())
+       .map(async ids => await fetchOnce(ids))
+  ).then(arr => res(arr.reduce((accr, cuur) => accr.concat(cuur))));
+
 });
 
 var container = document.getElementById('display');
@@ -74,11 +93,10 @@ async function drawRel(id) {
   working.className = '';
   var friends = await getFriends(id);
   working.className = 'hide';
-  if(!friends.ok) return;
   visited.push(id);
-  var info = (await getInfoByIds([id])).infos[0];
+  var info = (await getInfoByIds([id]))[0];
   addNode(id, info.personaname, info.avatarfull, nodes);
-  friends.friends.forEach(f => {
+  friends.forEach(f => {
     addNode(f.steamid, f.personaname, f.avatarfull, nodes);
     addEdge(id, f.steamid, edges);
   });
