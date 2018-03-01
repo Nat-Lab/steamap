@@ -87,15 +87,22 @@ var addEdge = function(n1, n2, dst) {
 async function drawRel(id) {
   if(visited.includes(id)) return;
   working.className = '';
-  var friends = await getFriends(id);
-  working.className = 'hide';
-  visited.push(id);
-  var info = (await getInfoByIds([id]))[0];
+  try {
+    var info = (await getInfoByIds([id]))[0];
+    var friends = await getFriends(id);
+  } catch (e) {
+    alert(`Error procressing id ${id}: ${e}.
+
+Is Is the profile public? Is the ID correct? (use SteamID64, not profile name or custom URL)`);
+    return;
+  }
   addNode(id, info.personaname, info.avatarfull, nodes);
   friends.forEach(f => {
     addNode(f.steamid, f.personaname, f.avatarfull, nodes);
     addEdge(id, f.steamid, edges);
   });
+  working.className = 'hide';
+  visited.push(id);
 }
 
 drawRel(prompt('ID to get started (SteamID64)'));
