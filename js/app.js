@@ -1,6 +1,3 @@
-api_key = localStorage.steamApiKey ? localStorage.steamApiKey : prompt('Steam API key (see http://steamcommunity.com/dev/apikey)');
-localStorage.steamApiKey = api_key;
-
 // https://stackoverflow.com/questions/8495687/split-array-into-chunks
 // too lazy.
 Object.defineProperty(Array.prototype, 'chunk', {
@@ -14,7 +11,7 @@ Object.defineProperty(Array.prototype, 'chunk', {
 
 var getFriends = id => new Promise((res, rej) => {
 
-  var api_pre = 'http://api.steampowered.com/ISteamUser/GetFriendList/v0001/?key=' + api_key + '&relationship=friend&steamid=';
+  var api_pre = 'http://api.nat.moe/steamapi/GetFriendList/?steamid=';
   var xhr = new XMLHttpRequest();
 
   xhr.open('GET', api_pre + id);
@@ -34,7 +31,7 @@ var getFriends = id => new Promise((res, rej) => {
 var getInfoByIds = ids => new Promise((res, rej) => {
 
   var fetchOnce = ids => new Promise((res, rej) => {
-    var prof_url = 'http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=' + api_key + '&steamids=' + ids;
+    var prof_url = 'http://api.nat.moe/steamapi/GetPlayerSummaries/?steamids=' + ids;
     var xhr = new XMLHttpRequest();
 
     xhr.open('GET', prof_url);
@@ -75,7 +72,6 @@ var visited = [];
 
 var addNode = function(id, name, image, dst) {
   if(!dst.get().filter(n => n.id == id).length)
-    console.log({id, label: name, shape: 'image', image});
     try {
     dst.add({id, label: name, shape: 'image', image, chosen: {
       node: (values, uid) => { drawRel(uid); }
