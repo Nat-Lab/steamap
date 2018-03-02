@@ -35,7 +35,17 @@ var getFriends = id => new Promise((res, rej) => {
 
 });
 
+var info_cache = [];
+
 var getInfoByIds = ids => new Promise((res, rej) => {
+
+  var cache_hit = [];
+  ids = ids.filter(id => {
+    if(info_cache[id]) {
+      cache_hit.push(info_cache[id]);
+      return false;
+    } else return true;
+  });
 
   var fetchOnce = ids => new Promise((res, rej) => {
     var prof_url = 'http://api.nat.moe/steamapi/GetPlayerSummaries/?steamids=' + ids;
@@ -51,11 +61,17 @@ var getInfoByIds = ids => new Promise((res, rej) => {
     xhr.send();
   });
 
+  if(!ids.length) res(cache_hit);
+
   Promise.all(
     ids.chunk(100)
        .map(arr => arr.join())
        .map(async ids => await fetchOnce(ids))
-  ).then(arr => res(arr.reduce((accr, cuur) => accr.concat(cuur))));
+  ).then(arr => {
+    var infos = arr.reduce((accr, cuur) => accr.concat(cuur));
+    infos.forEach(info => info_cache[info.steamid] = info);
+    res(infos.concat(cache_hit));
+  });
 
 
 });
@@ -88,10 +104,9 @@ graph.on('select', e => {
 var visited = [];
 
 var addNode = function(id, name, image, dst) {
-  if(!dst.get().filter(n => n.id == id).length)
-    try {
+  try {
     dst.add({id, label: name, shape: 'image', image});
-    } catch (e) {}
+  } catch (e) {}
 }
 
 var addEdge = function(n1, n2, dst) {
@@ -117,7 +132,7 @@ async function drawRel(id) {
   }
   addNode(id, info.personaname, info.avatarfull, nodes);
   friends.forEach(f => {
-    if (f.communityvisibilitystate != 3) visited.push(f.steamid);
+    if (f.communityvisibilitystate != 3 && !visited.includes(f.steamid)) visited.push(f.steamid);
     addNode(f.steamid, f.personaname, f.avatarfull, nodes);
     addEdge(id, f.steamid, edges);
   });
