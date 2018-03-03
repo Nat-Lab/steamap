@@ -93,11 +93,13 @@ var graph = new vis.Network(container, {nodes, edges}, {
   }
 });
 
+container.addEventListener('contextmenu', e => e.preventDefault(), false);
+
 graph.on('doubleClick', e => {
   if(e.nodes.length) window.open('http://steamcommunity.com/profiles/' + e.nodes[0]);
 });
 
-graph.on('select', e => {
+graph.on('oncontext', e => {
   if(e.nodes.length) drawRel(e.nodes[0]);
 });
 
@@ -140,10 +142,12 @@ async function drawRel(id) {
   visited.push(id);
 }
 
-drawRel(prompt('ID to get started (SteamID64)'));
+
+var promptids = () => prompt('Add User(s) by SteamID64 to map (separate by ",")').split(',').forEach(drawRel);
+
+promptids();
 document.addEventListener('keydown', e => {
-  if(e.key == "Enter") {
-    var as = prompt('Add User(s) by SteamID64 to map (separate by ",")');
-    as.split(',').forEach(drawRel);
-  }
-})
+  if(e.key == "Enter") promptids();
+});
+
+
