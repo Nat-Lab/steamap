@@ -1,11 +1,13 @@
 <html>
 <head>
+<title>SteaMap</title>
 <script type="text/javascript" src="node_modules/vis/dist/vis.js"></script>
 <link href="node_modules/vis/dist/vis.css" rel="stylesheet" type="text/css" />
 <style type="text/css">
 html, body {
   height: 100%;
   margin: 0;
+  font-family: monospace;
 }
 
 #display {
@@ -15,6 +17,7 @@ html, body {
 }
 
 #working {
+  padding: 2px;
   position: absolute;
   left: 4px;
   top: 4px;
@@ -24,15 +27,25 @@ html, body {
   position: absolute;
   left: 4px;
   bottom: 4px;
+  color: #666;
 }
 
 .hide {
   display: none;
 }
+
+.key {
+  font-weight: 700;
+  color: #000;
+}
 </style>
 <body>
 <div id="display"></div>
 <div id="working" class="hide">Working...</div>
-<div class="help">Click to expand and double click to open profile.</div>
+<div class="help">
+<div><span class="key">Right Click</span> to expand (draw friends).</div>
+<div><span class="key">Double click</span> to open profile.</div>
+<div><span class="key">Enter</span> to add users.</div>
+</div>
 <script src="js/app.js"></script>
 </body>
