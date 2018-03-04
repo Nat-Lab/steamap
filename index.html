@@ -21,6 +21,9 @@ html, body {
   position: absolute;
   left: 4px;
   top: 4px;
+  color: #eee;
+  background-color: #000;
+  padding: 2px 4px 2px 4px;
 }
 
 .help {
@@ -28,6 +31,28 @@ html, body {
   left: 4px;
   bottom: 4px;
   color: #666;
+}
+
+.infoplate {
+  position: absolute;
+  width: 400px;
+  right: 4px;
+  top: 4px;
+  border: 3px solid #333;
+  background-color: #fff;
+}
+
+#infoplate_img {
+  height: 90px;
+  width: 90px;
+  float: left;
+  margin-right: 4px;
+}
+
+#infoplate_game {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .hide {
@@ -47,6 +72,15 @@ html, body {
 <div><span class="key">Right Click</span> when selected to expand (draw friends).</div>
 <div><span class="key">Double click</span> to open profile.</div>
 <div><span class="key">Enter</span> to add users.</div>
+</div>
+<div class="infoplate">
+<img id="infoplate_img"></img>
+<div><span class="key" id="infoplate_name">username</span></div>
+<div><span class="key">SteamID64: </span><span id="infoplate_sid"></span></div>
+<div><span class="key">Status: </span><span id="infoplate_status"></span></div>
+<div><span class="key">Last online: </span><span id="infoplate_online"></span></div>
+<div><span class="key">Joined: </span><span id="infoplate_join"></span></div>
+<div><span class="key">Game: </span><span id="infoplate_game"></span></div>
 </div>
 <script src="js/app.js"></script>
 </body>

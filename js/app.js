@@ -111,6 +111,11 @@ graph.on('oncontext', e => {
   if(e.nodes.length) drawRel(e.nodes[0]);
 });
 
+graph.on('select', e => {
+  if(e.nodes.length) setInfoPlate(info_cache[e.nodes[0]]);
+});
+
+
 var visited = [];
 
 var addNode = function(id, name, image, dst) {
@@ -140,6 +145,7 @@ async function drawRel(id) {
     working.className = 'hide';
     return;
   }
+  setInfoPlate(info);
   addNode(id, info.personaname, info.avatarfull, nodes);
   friends.forEach(f => {
     if (f.communityvisibilitystate != 3 && !visited.includes(f.steamid)) visited.push(f.steamid);
@@ -149,6 +155,29 @@ async function drawRel(id) {
   working.className = 'hide';
   visited.push(id);
 }
+
+var infoplate = {
+  set name(x) { document.getElementById('infoplate_name').textContent = x },
+  set sid(x) { document.getElementById('infoplate_sid').textContent = x },
+  set status(x) { document.getElementById('infoplate_status').textContent = x },
+  set online(x) { document.getElementById('infoplate_online').textContent = x },
+  set join(x) { document.getElementById('infoplate_join').textContent = x },
+  set game(x) { document.getElementById('infoplate_game').textContent = x },
+  set img(x) { document.getElementById('infoplate_img').src = x }
+}
+
+const onlineStatus = ['offline', 'online', 'busy', 'away', 'snooze', 'looking to trade', 'looking to play'];
+const dateOption = { year: 'numeric', month: '2-digit', day: '2-digit', minute: '2-digit', hour: '2-digit' }
+
+var setInfoPlate = info => {
+  infoplate.name = info.personaname;
+  infoplate.sid = info.steamid;
+  infoplate.status = onlineStatus[info.personastate];
+  infoplate.online = (new Date(info.lastlogoff*1000)).toLocaleDateString('en-US', dateOption);
+  infoplate.join = (new Date(info.timecreated*1000)).toLocaleDateString('en-US', dateOption);
+  infoplate.game = info.gameextrainfo;
+  infoplate.img = info.avatarfull;
+};
 
 
 var promptids = () => prompt('Add User(s) by SteamID64 to map (separate by ",")').split(',').forEach(drawRel);
