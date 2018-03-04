@@ -90,6 +90,14 @@ var graph = new vis.Network(container, {nodes, edges}, {
     shapeProperties: {
       useBorderWithImage: true
     }
+  },
+  physics: {
+    solver: 'repulsion',
+    repulsion: {
+      nodeDistance: 150,
+      damping: .1,
+      springConstant: .01
+    }
   }
 });
 
