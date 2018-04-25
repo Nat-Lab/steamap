@@ -48,7 +48,7 @@ var getInfoByIds = ids => new Promise((res, rej) => {
   });
 
   var fetchOnce = ids => new Promise((res, rej) => {
-    var prof_url = 'http://api.nat.moe/steamapi/GetPlayerSummaries/?steamids=' + ids;
+    var prof_url = 'https://api.nat.moe/steamapi/GetPlayerSummaries/?steamids=' + ids;
     var xhr = new XMLHttpRequest();
 
     xhr.open('GET', prof_url);
