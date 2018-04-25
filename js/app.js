@@ -15,7 +15,7 @@ var getFriends = id => new Promise((res, rej) => {
 
   if(cached[id]) res(cached[id]);
 
-  var api_pre = 'http://api.nat.moe/steamapi/GetFriendList/?steamid=';
+  var api_pre = 'https://api.nat.moe/steamapi/GetFriendList/?steamid=';
   var xhr = new XMLHttpRequest();
 
   xhr.open('GET', api_pre + id);
